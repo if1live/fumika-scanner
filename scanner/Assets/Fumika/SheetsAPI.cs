@@ -29,13 +29,17 @@ namespace Assets.Fumika {
         public static SheetsAPI Instance { get; private set; }
 
         public string sheetName = "ISBN List";
+        public string SheetID = "13IXCsO7FPjhUmOG0bp08xfZXlusdkSER6b33xPMvV9M";
 
-        public string SheetID { get; private set; }
+        [SerializeField]
         string clientId = "488206440345-qoil6mlkij2ka8bh5fd8nibdar8lpjdg.apps.googleusercontent.com";
+
+        [SerializeField]
         string clientSecret = "paj_17vxQbCJcg3kKv8omqA4";
 
+        [SerializeField]
+        TokenContainer storage = null;
 
-        IGoogleDriveTokenStorage storage;
         GoogleDrive drive;
 
         public APIResponse LastResponse { get; private set; }
@@ -97,7 +101,7 @@ namespace Assets.Fumika {
                 "https://www.googleapis.com/auth/drive",
                 "https://www.googleapis.com/auth/spreadsheets",
             };
-            storage = new GoogleDriveTokenStorage_PlayerPrefs(clientId);
+
             drive = new GoogleDrive(storage);
             drive.ClientID = clientId;
             drive.ClientSecret = clientSecret;
@@ -115,12 +119,15 @@ namespace Assets.Fumika {
                 Debug.Log("User Account: " + drive.UserAccount);
             }
 
+            // 윈도우에서는 되는데 안드로이드에서는 안되서 하드코딩
+            /*
             var finder = new SheetsAPI_FindSheet(drive, this);
             yield return finder.BeginFindSheet(sheetName);
             if (!finder.Found) {
                 Debug.LogWarningFormat("Cannot find Sheet, {0}", sheetName);
             }
             SheetID = finder.SheetID;
+            */
 
             initInProgress = false;
         }

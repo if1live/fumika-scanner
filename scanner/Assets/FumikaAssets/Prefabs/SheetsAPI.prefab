@@ -51,3 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4253022238b6ab41a7482964527105b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sheetName: ISBN List
+  SheetID: 13IXCsO7FPjhUmOG0bp08xfZXlusdkSER6b33xPMvV9M
+  clientId: 488206440345-qoil6mlkij2ka8bh5fd8nibdar8lpjdg.apps.googleusercontent.com
+  clientSecret: paj_17vxQbCJcg3kKv8omqA4
+  storage: {fileID: 11400000, guid: 581a1fa9aca8e5e49afb8201eb5260b5, type: 2}
