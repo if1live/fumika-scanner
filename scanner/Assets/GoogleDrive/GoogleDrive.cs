@@ -75,11 +75,14 @@ partial class GoogleDrive
 	AndroidJavaClass pluginClass;
 #endif
 
+	IGoogleDriveTokenStorage Storage { get; set; }
+
 	/// <summary>
 	/// Constructor.
 	/// </summary>
-	public GoogleDrive()
+	public GoogleDrive(IGoogleDriveTokenStorage storage)
 	{
+		this.Storage = storage;
 #if !UNITY_EDITOR && UNITY_ANDROID
 		pluginClass = new AndroidJavaClass("com.studio272.googledriveplugin.GoogleDrivePlugin");
 

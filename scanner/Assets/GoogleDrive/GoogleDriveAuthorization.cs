@@ -66,103 +66,22 @@ partial class GoogleDrive
 		private set { isAuthorized = value; }
 	}
 
-	string accessToken = null;
-
-	/// <summary>
-	/// Access token.
-	/// </summary>
 	string AccessToken
 	{
-		get
-		{
-			if (accessToken == null)
-			{
-				int key = ClientID.GetHashCode();
-				accessToken = PlayerPrefs.GetString("UnityGoogleDrive_Token_" + key, "");
-			}
-
-			return accessToken;
-		}
-		set
-		{
-			if (accessToken != value)
-			{
-				accessToken = value;
-
-				int key = ClientID.GetHashCode();
-
-				if (accessToken != null)
-					PlayerPrefs.SetString("UnityGoogleDrive_Token_" + key, accessToken);
-				else
-					PlayerPrefs.DeleteKey("UnityGoogleDrive_Token_" + key);
-			}
-		}
+		get { return Storage.AccessToken; }
+		set { Storage.AccessToken = value; }
 	}
 
-	string refreshToken = null;
-
-	/// <summary>
-	/// Refresh token.
-	/// </summary>
 	string RefreshToken
 	{
-		get
-		{
-			if (refreshToken == null)
-			{
-				int key = ClientID.GetHashCode();
-				refreshToken = PlayerPrefs.GetString("UnityGoogleDrive_RefreshToken_" + key, "");
-			}
-
-			return refreshToken;
-		}
-		set
-		{
-			if (refreshToken != value)
-			{
-				refreshToken = value;
-
-				int key = ClientID.GetHashCode();
-
-				if (refreshToken != null)
-					PlayerPrefs.SetString("UnityGoogleDrive_RefreshToken_" + key, refreshToken);
-				else
-					PlayerPrefs.DeleteKey("UnityGoogleDrive_RefreshToken_" + key);
-			}
-		}
+		get { return Storage.RefreshToken; }
+		set { Storage.RefreshToken = value; }
 	}
 
-	string userAccount = null;
-
-	/// <summary>
-	/// User's E-Mail address.
-	/// </summary>
 	public string UserAccount
 	{
-		get
-		{
-			if (userAccount == null)
-			{
-				int key = ClientID.GetHashCode();
-				userAccount = PlayerPrefs.GetString("UnityGoogleDrive_UserAccount_" + key, "");
-			}
-
-			return userAccount;
-		}
-		private set
-		{
-			if (userAccount != value)
-			{
-				userAccount = value;
-
-				int key = ClientID.GetHashCode();
-
-				if (userAccount != null)
-					PlayerPrefs.SetString("UnityGoogleDrive_UserAccount_" + key, userAccount);
-				else
-					PlayerPrefs.DeleteKey("UnityGoogleDrive_UserAccount_" + key);
-			}
-		}
+		get { return Storage.UserAccount; }
+		set { Storage.UserAccount = value; }
 	}
 
 	/// <summary>
@@ -268,7 +187,7 @@ partial class GoogleDrive
 		else
 		{
 			// Check the access token.
-			var validate = ValidateToken(accessToken);
+			var validate = ValidateToken(AccessToken);
 			{
 				while (validate.MoveNext())
 					yield return null;
@@ -523,7 +442,7 @@ partial class GoogleDrive
 		}
 
 		// And validate for email address.
-		var validate = ValidateToken(accessToken);
+		var validate = ValidateToken(AccessToken);
 		{
 			while (validate.MoveNext())
 				yield return null;
@@ -574,7 +493,7 @@ partial class GoogleDrive
 		}
 
 		// And validate for email address.
-		var validate = ValidateToken(accessToken);
+		var validate = ValidateToken(AccessToken);
 		{
 			while (validate.MoveNext())
 				yield return null;

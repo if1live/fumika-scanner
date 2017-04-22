@@ -36,9 +36,12 @@ public class DriveTest : MonoBehaviour
 	{
 		initInProgress = true;
 
-		drive = new GoogleDrive();
-		drive.ClientID = "897584417662-rnkgkl5tlpnsau7c4oc0g2jp08cpluom.apps.googleusercontent.com";
-		drive.ClientSecret = "tGNLbYnrdRO2hdFmwJAo5Fbt";
+		var clientId = "897584417662-rnkgkl5tlpnsau7c4oc0g2jp08cpluom.apps.googleusercontent.com"; ;
+		var clientSecret = "tGNLbYnrdRO2hdFmwJAo5Fbt";
+
+		drive = new GoogleDrive(new GoogleDriveTokenStorage_PlayerPrefs(clientId));
+		drive.ClientID = clientId;
+		drive.ClientSecret = clientSecret;
 
 		drive.Scopes = new string[] {
 			"https://www.googleapis.com/auth/drive.file",
