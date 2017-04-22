@@ -18,7 +18,9 @@ namespace Assets.Fumika {
                 ResponseCode = www.responseCode;
                 Error = www.error;
 
-                ResponseJSON = new JSONObject(www.downloadHandler.text, int.MaxValue);
+                var text = www.downloadHandler.text;
+                ResponseJSON = new JSONObject(text, int.MaxValue);
+                Debug.Log(text);
             }
         }
     }
@@ -29,8 +31,9 @@ namespace Assets.Fumika {
         public string sheetName = "ISBN List";
 
         public string SheetID { get; private set; }
-        string clientId = "488206440345-ncua72rcgirjkubrn0ubru20r6vn0f7k.apps.googleusercontent.com";
-        string clientSecret = "XyV8fpK4i9VqIXdlLWguUhtM";
+        string clientId = "488206440345-qoil6mlkij2ka8bh5fd8nibdar8lpjdg.apps.googleusercontent.com";
+        string clientSecret = "paj_17vxQbCJcg3kKv8omqA4";
+
 
         IGoogleDriveTokenStorage storage;
         GoogleDrive drive;
@@ -84,7 +87,7 @@ namespace Assets.Fumika {
 
         bool initInProgress = false;
 
-        IEnumerator BeginInit() {
+        public IEnumerator BeginInit() {
             initInProgress = true;
 
             var scopes = new string[] {
@@ -146,13 +149,10 @@ namespace Assets.Fumika {
         }
 
         bool revokeInProgress = false;
-        IEnumerator BeginRevoke() {
+        public IEnumerator BeginRevoke() {
             revokeInProgress = true;
             yield return StartCoroutine(drive.Unauthorize());
             revokeInProgress = false;
         }
-
-
-
     }
 }

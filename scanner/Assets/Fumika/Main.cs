@@ -18,6 +18,9 @@ public class Main : MonoBehaviour {
     public Button startButton;
     public Button stopButton;
 
+    public Button initButton;
+    public Button revokeButton;
+
     public SendButton sendButton;
 
     // Disable Screen Rotation on that screen
@@ -54,6 +57,8 @@ public class Main : MonoBehaviour {
         // 버튼 핸들러 등록
         startButton.onClick.AddListener(ClickStart);
         stopButton.onClick.AddListener(ClickStop);
+        initButton.onClick.AddListener(OnInitClicked);
+        revokeButton.onClick.AddListener(OnRevokeClicked);
     }
 
     /// <summary>
@@ -125,6 +130,24 @@ public class Main : MonoBehaviour {
         yield return new WaitForSeconds(0.1f);
 
         callback.Invoke();
+    }
+
+    public void OnInitClicked() {
+        StartCoroutine(BeginInitClick());
+    }
+    IEnumerator BeginInitClick() {
+        initButton.interactable = false;
+        yield return SheetsAPI.Instance.BeginInit();
+        initButton.interactable = true;
+    }
+
+    public void OnRevokeClicked() {
+        StartCoroutine(BeginRevokeClick());
+    }
+    IEnumerator BeginRevokeClick() {
+        revokeButton.interactable = false;
+        yield return SheetsAPI.Instance.BeginRevoke();
+        revokeButton.interactable = true;
     }
 
     #endregion
