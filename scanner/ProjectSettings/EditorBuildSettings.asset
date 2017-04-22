@@ -6,8 +6,5 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Samples/Boot.unity
-  - enabled: 1
-    path: Assets/Samples/Simple/SimpleDemo.unity
-  - enabled: 1
-    path: Assets/Samples/Continuous/ContinuousDemo.unity
+    path: Assets/FumikaScenes/Main.unity
+    guid: e4ef5c7bb3f66a7409e2084e207a2b7a
