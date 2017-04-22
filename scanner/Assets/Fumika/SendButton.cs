@@ -1,47 +1,8 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Fumika {
-    [Serializable]
-    public class ServerInfo {
-        public string host;
-        public int port;
-
-        public string GetName() {
-            return host + ":" + port;
-        }
-
-        public bool TryFill(string text) {
-            host = "";
-            port = 0;
-
-            if (text == null || text == "") {
-                return false;
-            }
-
-            var tokens = text.Split(':');
-            if (tokens.Length != 2) {
-                return false;
-            }
-
-            if (!int.TryParse(tokens[1], out port)) {
-                return false;
-            }
-
-            host = tokens[0];
-            return true;
-        }
-
-        public bool IsValid() {
-            if(host != null && host != "" && port > 0) {
-                return true;
-            }
-            return false;
-        }
-    }
-
     public class SendButton : MonoBehaviour {
         [SerializeField]
         string codeType = "";
@@ -87,26 +48,24 @@ namespace Assets.Fumika {
             buttonText.text = string.Format("Sending: {0}", codeValue);
             Debug.LogFormat("send type={0}, value={1}, server={2}", codeType, codeValue, server.GetName());
 
-            yield return null;
+            var api = SheetsAPI.Instance;
+            yield return api.BeginWaitInitialize();
+            yield return api.BeginAppendValue(codeValue);
+            var resp = api.LastResponse;
 
+            if (resp.IsError) {
+                buttonText.text = string.Format("API Error {0}", resp.Error);
+            } else if (resp.ResponseCode != 200) {
+                buttonText.text = string.Format("Fail {0}", resp.ResponseCode);
+            } else {
+                buttonText.text = string.Format("Complete: {0}", codeValue);
+            }
 
-            // TODO http 통신 집어넣기
-            // 중앙 서버 하나 있으면 될거같은데
-
-
-            buttonText.text = string.Format("Complete: {0}", codeValue);
             codeType = "";
             codeValue = "";
         }
 
         bool IsSendable() {
-            if (!server.IsValid()) {
-                return false;
-            }
-
-            if (codeType == null || codeType == "") {
-                return false;
-            }
             if (codeValue == null || codeValue == "") {
                 return false;
             }
