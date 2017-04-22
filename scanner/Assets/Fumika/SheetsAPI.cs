@@ -26,7 +26,9 @@ namespace Assets.Fumika {
     public class SheetsAPI : MonoBehaviour {
         public static SheetsAPI Instance { get; private set; }
 
-        string sheetID = "13IXCsO7FPjhUmOG0bp08xfZXlusdkSER6b33xPMvV9M";
+        public string sheetName = "ISBN List";
+
+        public string SheetID { get; private set; }
         string clientId = "488206440345-ncua72rcgirjkubrn0ubru20r6vn0f7k.apps.googleusercontent.com";
         string clientSecret = "XyV8fpK4i9VqIXdlLWguUhtM";
 
@@ -37,7 +39,7 @@ namespace Assets.Fumika {
 
         public IEnumerator BeginAppendValue(string val) {
             var range = "A1";
-            var uri = string.Format("https://sheets.googleapis.com/v4/spreadsheets/{0}/values/{1}:append", sheetID, range);
+            var uri = string.Format("https://sheets.googleapis.com/v4/spreadsheets/{0}/values/{1}:append", SheetID, range);
 
             // Query parameters
             var qs = new QueryStringBuilder();
@@ -81,7 +83,6 @@ namespace Assets.Fumika {
         }
 
         bool initInProgress = false;
-        bool initFinished = false;
 
         IEnumerator BeginInit() {
             initInProgress = true;
@@ -111,12 +112,21 @@ namespace Assets.Fumika {
                 Debug.Log("User Account: " + drive.UserAccount);
             }
 
-            initFinished = true;
+            var finder = new SheetsAPI_FindSheet(drive, this);
+            yield return finder.BeginFindSheet(sheetName);
+            if (!finder.Found) {
+                Debug.LogWarningFormat("Cannot find Sheet, {0}", sheetName);
+            }
+            SheetID = finder.SheetID;
+
             initInProgress = false;
         }
 
         public IEnumerator BeginWaitInitialize() {
-            while(initFinished == false) {
+            while(drive == null) {
+                yield return null;
+            }
+            while (initInProgress == true) {
                 yield return null;
             }
         }
@@ -141,5 +151,8 @@ namespace Assets.Fumika {
             yield return StartCoroutine(drive.Unauthorize());
             revokeInProgress = false;
         }
+
+
+
     }
 }

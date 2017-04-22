@@ -16,6 +16,7 @@ namespace Assets.Fumika {
         InputField serverAddrInput = null;
 
         Text buttonText = null;
+        Button button = null;
 
         public void SetBarcode(string barCodeType, string barCodeValue) {
             this.codeType = barCodeType;
@@ -27,7 +28,7 @@ namespace Assets.Fumika {
         void Awake() {
             Debug.Assert(serverAddrInput != null);
 
-            var button = GetComponent<Button>();
+            button = GetComponent<Button>();
             button.onClick.AddListener(OnClick);
 
             buttonText = button.GetComponentInChildren<Text>();
@@ -37,6 +38,19 @@ namespace Assets.Fumika {
             {
                 server.TryFill(text);
             });
+        }
+
+        void Start() {
+            StartCoroutine(BeginWaitInitialize());
+        }
+
+        IEnumerator BeginWaitInitialize() {
+            button.interactable = false;
+
+            var api = SheetsAPI.Instance;
+            yield return api.BeginWaitInitialize();
+
+            button.interactable = true;
         }
 
         IEnumerator BeginSend() {
@@ -49,7 +63,6 @@ namespace Assets.Fumika {
             Debug.LogFormat("send type={0}, value={1}, server={2}", codeType, codeValue, server.GetName());
 
             var api = SheetsAPI.Instance;
-            yield return api.BeginWaitInitialize();
             yield return api.BeginAppendValue(codeValue);
             var resp = api.LastResponse;
 
