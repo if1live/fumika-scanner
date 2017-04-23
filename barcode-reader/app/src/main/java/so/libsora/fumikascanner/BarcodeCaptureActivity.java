@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.google.android.gms.samples.vision.barcodereader;
+package so.libsora.fumikascanner;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -42,10 +42,11 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSource;
-import com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview;
+import so.libsora.fumikascanner.ui.camera.CameraSource;
+import so.libsora.fumikascanner.ui.camera.CameraSourcePreview;
 
-import com.google.android.gms.samples.vision.barcodereader.ui.camera.GraphicOverlay;
+import so.libsora.fumikascanner.ui.camera.GraphicOverlay;
+
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.gms.samples.vision.barcodereader;
+package so.libsora.fumikascanner;
 
 import android.content.Intent;
 import android.os.Bundle;

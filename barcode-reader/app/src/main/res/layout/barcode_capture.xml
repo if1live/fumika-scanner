@@ -8,16 +8,16 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true">
 
-  <com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview
+  <so.libsora.fumikascanner.ui.camera.CameraSourcePreview
       android:id="@+id/preview"
       android:layout_width="match_parent"
       android:layout_height="match_parent">
 
-    <com.google.android.gms.samples.vision.barcodereader.ui.camera.GraphicOverlay
+    <so.libsora.fumikascanner.ui.camera.GraphicOverlay
         android:id="@+id/graphicOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-  </com.google.android.gms.samples.vision.barcodereader.ui.camera.CameraSourcePreview>
+  </so.libsora.fumikascanner.ui.camera.CameraSourcePreview>
 
 </LinearLayout>
