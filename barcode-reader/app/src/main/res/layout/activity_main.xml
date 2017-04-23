@@ -58,4 +58,15 @@
         android:layout_alignParentEnd="true"
         android:checked="false" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/send_barcode"
+        android:id="@+id/send_barcode"
+        android:layout_above="@+id/read_barcode"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>

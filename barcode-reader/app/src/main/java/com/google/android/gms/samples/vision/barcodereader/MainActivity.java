@@ -21,8 +21,10 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -39,8 +41,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private TextView statusMessage;
     private TextView barcodeValue;
 
+    private Button sendButton;
+
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
+
+    String barcodeText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,15 @@ public class MainActivity extends Activity implements View.OnClickListener {
         useFlash = (CompoundButton) findViewById(R.id.use_flash);
 
         findViewById(R.id.read_barcode).setOnClickListener(this);
+
+        sendButton = (Button)findViewById(R.id.send_barcode);
+        sendButton.setClickable(false);
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getApplicationContext(), barcodeText, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -105,13 +120,26 @@ public class MainActivity extends Activity implements View.OnClickListener {
                     statusMessage.setText(R.string.barcode_success);
                     barcodeValue.setText(barcode.displayValue);
                     Log.d(TAG, "Barcode read: " + barcode.displayValue);
+
+                    barcodeText = barcode.displayValue;
+                    sendButton.setClickable(true);
+                    sendButton.setText("Ready : " + barcodeText);
+
                 } else {
                     statusMessage.setText(R.string.barcode_failure);
                     Log.d(TAG, "No barcode captured, intent data is null");
+
+                    barcodeText = "";
+                    sendButton.setClickable(false);
+                    sendButton.setText("No bardoce captured");
                 }
             } else {
-                statusMessage.setText(String.format(getString(R.string.barcode_error),
-                        CommonStatusCodes.getStatusCodeString(resultCode)));
+                String msg = String.format(getString(R.string.barcode_error), CommonStatusCodes.getStatusCodeString(resultCode));
+                statusMessage.setText(msg);
+
+                barcodeText = "";
+                sendButton.setClickable(false);
+                sendButton.setText(msg);
             }
         }
         else {
