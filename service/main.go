@@ -72,6 +72,10 @@ func updateInfo(sheet *spreadsheet.Sheet, config Config) {
 		}
 
 		isbn := row[fieldISBN].Value
+		if isbn == "" {
+			continue
+		}
+
 		title := row[fieldTitle].Value
 		if title != "" {
 			continue
@@ -135,6 +139,10 @@ func updateUsedBookPrice(sheet *spreadsheet.Sheet, config Config) {
 		}
 
 		isbn := row[fieldISBN].Value
+		if isbn == "" {
+			continue
+		}
+
 		updateUsedBookRow(isbn, sheet, rowIdx, aladinAPI, aladinFields, "aladin")
 		updateUsedBookRow(isbn, sheet, rowIdx, yes24API, yes24Fields, "yes24")
 
