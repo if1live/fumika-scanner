@@ -51,6 +51,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.api.services.sheets.v4.model.AppendValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
@@ -66,6 +67,8 @@ import pub.devrel.easypermissions.EasyPermissions;
  * reads barcodes.
  */
 public class MainActivity extends Activity implements View.OnClickListener, EasyPermissions.PermissionCallbacks {
+    // ISBN 목록을 집어넣을 시트 이름
+    static String spreadsheetId = "13IXCsO7FPjhUmOG0bp08xfZXlusdkSER6b33xPMvV9M";
 
     // use a compound button so either checkbox or switch widgets work.
     private CompoundButton autoFocus;
@@ -78,7 +81,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
     private static final int RC_BARCODE_CAPTURE = 9001;
     private static final String TAG = "BarcodeMain";
 
-    String barcodeText;
+    String barcodeText = "";
 
     // https://developers.google.com/sheets/api/quickstart/android
     GoogleAccountCredential mCredential;
@@ -90,9 +93,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
     static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    private static final String[] SCOPES = { SheetsScopes.SPREADSHEETS_READONLY };
+    private static final String[] SCOPES = {
+            SheetsScopes.SPREADSHEETS,
+    };
 
-    // TODO?
     private static final String PREF_ACCOUNT_NAME = "accountName";
 
 
@@ -118,7 +122,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
 
                 sendButton.setEnabled(false);
                 mOutputText.setText("");
-                getResultsFromApi();
+
+                if(barcodeText == "" || barcodeText == null) {
+                    Toast.makeText(getApplicationContext(), "Empty ISBN!", Toast.LENGTH_SHORT).show();
+                } else {
+                    appendISBN(barcodeText);
+                }
+
+                barcodeText = "";
                 sendButton.setEnabled(true);
             }
         });
@@ -209,13 +220,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
         else {
             // google drvie
             super.onActivityResult(requestCode, resultCode, data);
+
             if(requestCode == REQUEST_GOOGLE_PLAY_SERVICES) {
                 if (resultCode != RESULT_OK) {
                     mOutputText.setText(
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
-                    getResultsFromApi();
+                    appendISBN(barcodeText);
                 }
 
             } else if(requestCode == REQUEST_ACCOUNT_PICKER) {
@@ -230,19 +242,19 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        getResultsFromApi();
+                        appendISBN(barcodeText);
                     }
                 }
 
             } else if(requestCode == REQUEST_AUTHORIZATION) {
                 if (resultCode == RESULT_OK) {
-                    getResultsFromApi();
+                    appendISBN(barcodeText);
                 }
             }
         }
     }
 
-    private void getResultsFromApi() {
+    private void appendISBN(String isbn) {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -250,7 +262,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
         } else if (! isDeviceOnline()) {
             mOutputText.setText("No network connection available.");
         } else {
-            new MakeRequestTask(mCredential).execute();
+            new MakeRequestTask(mCredential).execute(isbn);
         }
     }
 
@@ -262,7 +274,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                getResultsFromApi();
+                appendISBN(barcodeText);
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(
@@ -358,7 +370,7 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
      * An asynchronous task that handles the Google Sheets API call.
      * Placing the API calls in their own task ensures the UI stays responsive.
      */
-    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
+    private class MakeRequestTask extends AsyncTask<String, Void, List<String>> {
         private com.google.api.services.sheets.v4.Sheets mService = null;
         private Exception mLastError = null;
 
@@ -376,9 +388,14 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
          * @param params no parameters needed for this task.
          */
         @Override
-        protected List<String> doInBackground(Void... params) {
+        protected List<String> doInBackground(String... params) {
             try {
-                return getDataFromApi();
+                AppendValuesResponse resp = appendData(params);
+                List<String> isbns = new ArrayList<String>();
+                for(int i = 0 ; i < params.length ; i++) {
+                    isbns.add(params[i]);
+                }
+                return isbns;
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
@@ -386,27 +403,31 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
             }
         }
 
-        /**
-         * Fetch a list of names and majors of students in a sample spreadsheet:
-         * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-         * @return List of names and majors
-         * @throws IOException
-         */
-        private List<String> getDataFromApi() throws IOException {
-            String spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms";
-            String range = "Class Data!A2:E";
-            List<String> results = new ArrayList<String>();
-            ValueRange response = this.mService.spreadsheets().values()
-                    .get(spreadsheetId, range)
-                    .execute();
-            List<List<Object>> values = response.getValues();
-            if (values != null) {
-                results.add("Name, Major");
-                for (List row : values) {
-                    results.add(row.get(0) + ", " + row.get(4));
-                }
+        AppendValuesResponse appendData(String... isbnArray) throws IOException {
+            // http://stackoverflow.com/questions/40781620/how-to-write-and-update-data-to-google-spreadsheet-android-api-v4
+            String range = "A2";
+
+            List<List<Object>> values = new ArrayList<>();
+
+            for(int i = 0 ; i < isbnArray.length ; i++) {
+                String isbn = isbnArray[i];
+                List<Object> data1 = new ArrayList<>();
+                data1.add(isbn);
+                values.add(data1);
             }
-            return results;
+
+            //Create the valuerange object and set its fields
+            ValueRange valueRange = new ValueRange();
+            valueRange.setMajorDimension("ROWS");
+            valueRange.setRange(range);
+            valueRange.setValues(values);
+
+            AppendValuesResponse response = mService.spreadsheets().values()
+                    .append(spreadsheetId, range, valueRange)
+                    .setValueInputOption("USER_ENTERED")
+                    .setInsertDataOption("INSERT_ROWS")
+                    .execute();
+            return response;
         }
 
 
@@ -420,11 +441,16 @@ public class MainActivity extends Activity implements View.OnClickListener, Easy
         @Override
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
+            sendButton.setText("New Barcode required");
+
             if (output == null || output.size() == 0) {
                 mOutputText.setText("No results returned.");
+
             } else {
                 output.add(0, "Data retrieved using the Google Sheets API:");
                 mOutputText.setText(TextUtils.join("\n", output));
+
+
             }
         }
 
