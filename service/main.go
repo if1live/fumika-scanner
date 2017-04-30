@@ -67,6 +67,10 @@ func updateInfo(sheet *spreadsheet.Sheet, config Config) {
 	searchAPI := NewSearchAPI(config.NaverClientID, config.NaverClientSecret)
 
 	for rowIdx, row := range sheet.Rows {
+		if rowIdx == 0 {
+			continue
+		}
+
 		isbn := row[fieldISBN].Value
 		title := row[fieldTitle].Value
 		if title != "" {
@@ -121,6 +125,10 @@ func updateUsedBookPrice(sheet *spreadsheet.Sheet, config Config) {
 	nowStr := now.Format("2006-01-02")
 
 	for rowIdx, row := range sheet.Rows {
+		if rowIdx == 0 {
+			continue
+		}
+
 		cmd := row[fieldUsedBookCmd].Value
 		if cmd == commandSkip {
 			continue
