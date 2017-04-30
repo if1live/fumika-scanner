@@ -15,7 +15,11 @@
  */
 package so.libsora.fumikascanner;
 
+import android.content.Intent;
+
 import so.libsora.fumikascanner.ui.camera.GraphicOverlay;
+
+import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -29,10 +33,12 @@ import com.google.android.gms.vision.barcode.Barcode;
 class BarcodeGraphicTracker extends Tracker<Barcode> {
     private GraphicOverlay<BarcodeGraphic> mOverlay;
     private BarcodeGraphic mGraphic;
+    BarcodeCaptureActivity mActivity;
 
-    BarcodeGraphicTracker(GraphicOverlay<BarcodeGraphic> overlay, BarcodeGraphic graphic) {
+    BarcodeGraphicTracker(GraphicOverlay<BarcodeGraphic> overlay, BarcodeGraphic graphic, BarcodeCaptureActivity activity) {
         mOverlay = overlay;
         mGraphic = graphic;
+        mActivity = activity;
     }
 
     /**
@@ -41,6 +47,14 @@ class BarcodeGraphicTracker extends Tracker<Barcode> {
     @Override
     public void onNewItem(int id, Barcode item) {
         mGraphic.setId(id);
+
+        int len = item.rawValue.length();
+        if(len == 11 || len == 13) {
+            Intent data = new Intent();
+            data.putExtra(mActivity.BarcodeObject, item);
+            mActivity.setResult(CommonStatusCodes.SUCCESS, data);
+            mActivity.finish();
+        }
     }
 
     /**
