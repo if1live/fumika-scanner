@@ -1,0 +1,6 @@
+{
+    "naver_client_id" : "naver-client-id",
+	"naver_client_secret" : "naver-client-secret",
+	"spreadsheet_id" : "spreadsheet_id",
+	"sheet_id" : 0
+}

@@ -88,3 +88,24 @@ google-services.json
 freeline.py
 freeline/
 freeline_project_description.json
+
+## golang
+# Binaries for programs and plugins
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
+.glide/
+
+
+## configure
+client_secret.json
+config.json
