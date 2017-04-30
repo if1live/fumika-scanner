@@ -23,29 +23,22 @@ const (
 	fieldPublisher = 3
 	fieldPrice     = 4
 
-	fieldAladinCmd         = 5
-	fieldAladinPriceBest   = fieldAladinCmd + 1
-	fieldAladinPriceGood   = fieldAladinCmd + 2
-	fieldAladinPriceNormal = fieldAladinCmd + 3
-	fieldAladinUpdatedAt   = fieldAladinCmd + 4
-	fieldAladinEnd         = fieldAladinCmd + 5
-
-	fieldYes24Cmd         = fieldAladinEnd
-	fieldYes24PriceBest   = fieldYes24Cmd + 1
-	fieldYes24PriceGood   = fieldYes24Cmd + 2
-	fieldYes24PriceNormal = fieldYes24Cmd + 3
-	fieldYes24UpdatedAt   = fieldYes24Cmd + 4
-	fieldYes24End         = fieldYes24Cmd + 5
+	fieldUsedBookCmd       = 5
+	fieldAladinPriceBest   = fieldUsedBookCmd + 1
+	fieldAladinPriceGood   = fieldUsedBookCmd + 2
+	fieldAladinPriceNormal = fieldUsedBookCmd + 3
+	fieldYes24PriceBest    = fieldUsedBookCmd + 4
+	fieldYes24PriceGood    = fieldUsedBookCmd + 5
+	fieldYes24PriceNormal  = fieldUsedBookCmd + 6
+	fieldUsedBookUpdatedAt = fieldUsedBookCmd + 7
 
 	commandSkip = "skip"
 )
 
 type UsedBookFieldList struct {
-	cmd         int
 	priceBest   int
 	priceGood   int
 	priceNormal int
-	updatedAt   int
 }
 
 type Config struct {
@@ -95,56 +88,51 @@ func updateInfo(sheet *spreadsheet.Sheet, config Config) {
 	}
 }
 
-func updateUsedBook(sheet *spreadsheet.Sheet, api fumika.SearchAPI, fields UsedBookFieldList, tag string) {
+func updateUsedBookRow(isbn string, sheet *spreadsheet.Sheet, rowIdx int, api fumika.SearchAPI, fields UsedBookFieldList, tag string) {
+	result, err := api.SearchISBN(isbn)
+	if err != nil {
+		return
+	}
+
+	sheet.Update(rowIdx, fields.priceBest, strconv.Itoa(result.PriceBest))
+	sheet.Update(rowIdx, fields.priceGood, strconv.Itoa(result.PriceGood))
+	sheet.Update(rowIdx, fields.priceNormal, strconv.Itoa(result.PriceNormal))
+	fmt.Printf("[update usedbook %s] isbn=%s -> title=%s\n", tag, isbn, result.Title)
+}
+
+func updateUsedBookPrice(sheet *spreadsheet.Sheet, config Config) {
+	httpclient := &http.Client{}
+
+	aladinAPI := fumika.NewAladin(httpclient)
+	aladinFields := UsedBookFieldList{
+		priceBest:   fieldAladinPriceBest,
+		priceGood:   fieldAladinPriceGood,
+		priceNormal: fieldAladinPriceNormal,
+	}
+
+	yes24API := fumika.NewYes24(httpclient)
+	yes24Fields := UsedBookFieldList{
+		priceBest:   fieldYes24PriceBest,
+		priceGood:   fieldYes24PriceGood,
+		priceNormal: fieldYes24PriceNormal,
+	}
+
 	now := time.Now()
-	nowStr := now.Format("2006-01-02 15:04:05")
+	nowStr := now.Format("2006-01-02")
 
 	for rowIdx, row := range sheet.Rows {
-		cmd := row[fields.cmd].Value
+		cmd := row[fieldUsedBookCmd].Value
 		if cmd == commandSkip {
 			continue
 		}
 
 		isbn := row[fieldISBN].Value
-		result, err := api.SearchISBN(isbn)
-		if err != nil {
-			continue
-		}
+		updateUsedBookRow(isbn, sheet, rowIdx, aladinAPI, aladinFields, "aladin")
+		updateUsedBookRow(isbn, sheet, rowIdx, yes24API, yes24Fields, "yes24")
 
-		sheet.Update(rowIdx, fields.cmd, commandSkip)
-		sheet.Update(rowIdx, fields.priceBest, strconv.Itoa(result.PriceBest))
-		sheet.Update(rowIdx, fields.priceGood, strconv.Itoa(result.PriceGood))
-		sheet.Update(rowIdx, fields.priceNormal, strconv.Itoa(result.PriceNormal))
-		sheet.Update(rowIdx, fields.updatedAt, nowStr)
-		fmt.Printf("[update usedbook %s] isbn=%s -> title=%s\n", tag, isbn, result.Title)
+		sheet.Update(rowIdx, fieldUsedBookCmd, commandSkip)
+		sheet.Update(rowIdx, fieldUsedBookUpdatedAt, nowStr)
 	}
-}
-
-func updateYes24Data(sheet *spreadsheet.Sheet, config Config) {
-	httpclient := &http.Client{}
-	api := fumika.NewYes24(httpclient)
-	fields := UsedBookFieldList{
-		cmd:         fieldYes24Cmd,
-		priceBest:   fieldYes24PriceBest,
-		priceGood:   fieldYes24PriceGood,
-		priceNormal: fieldYes24PriceNormal,
-		updatedAt:   fieldYes24UpdatedAt,
-	}
-	updateUsedBook(sheet, api, fields, "yes24")
-}
-
-func updateAladinData(sheet *spreadsheet.Sheet, config Config) {
-	httpclient := &http.Client{}
-	api := fumika.NewAladin(httpclient)
-
-	fields := UsedBookFieldList{
-		cmd:         fieldAladinCmd,
-		priceBest:   fieldAladinPriceBest,
-		priceGood:   fieldAladinPriceGood,
-		priceNormal: fieldAladinPriceNormal,
-		updatedAt:   fieldAladinUpdatedAt,
-	}
-	updateUsedBook(sheet, api, fields, "aladin")
 }
 
 func main() {
@@ -169,11 +157,7 @@ func main() {
 	err = sheet.Synchronize()
 	checkError(err)
 
-	updateAladinData(sheet, config)
-	err = sheet.Synchronize()
-	checkError(err)
-
-	updateYes24Data(sheet, config)
+	updateUsedBookPrice(sheet, config)
 	err = sheet.Synchronize()
 	checkError(err)
 }
