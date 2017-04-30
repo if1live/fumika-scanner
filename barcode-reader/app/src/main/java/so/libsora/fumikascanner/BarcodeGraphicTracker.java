@@ -49,7 +49,7 @@ class BarcodeGraphicTracker extends Tracker<Barcode> {
         mGraphic.setId(id);
 
         int len = item.rawValue.length();
-        if(len == 11 || len == 13) {
+        if(len == 10 || len == 13) {
             Intent data = new Intent();
             data.putExtra(mActivity.BarcodeObject, item);
             mActivity.setResult(CommonStatusCodes.SUCCESS, data);
