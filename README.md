@@ -64,12 +64,15 @@ client id, client secret를 확보한다.
 ![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-icon.png)
 
 2. `READ BARCODE`를 누르면 바코드를 찍을수 있다. 이 상태에서 바코드를 찍는다.
+
 ![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-init.png)
 
 3. `READY: {ISBN}` 버튼을 누른다. 찍은 바코드를 구글 스프레드시트에 업로드하게된다.
+
 ![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-isbn.png)
 
 4. 바코드가 스프레드시트에 추가되었는지 확인한다.
+
 ![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/sheet-isbn-sample.png)
 
 5. 문제가 없다면 바코드 찍고 업로드하는 과정을 반복한다.
