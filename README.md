@@ -2,6 +2,8 @@
 
 중고책 처분 프로세스
 
+![screenshot](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/final-result.jpeg)
+
 ## 특징
 * 안드로이드 앱으로 ISBN을 스캔할 수 있다
 * 중고 매각가를 조회할 수 있다
@@ -40,7 +42,7 @@
 
 `IAM 및 관리자` -> `서비스 계정`을 찾아서 들어간다.
 이전에 선택한 서비스 계정 ID의 이메일 주소를 알아낸다.
-스프레드시트의 공유 설정에 들어가서 해당 이메일을 수정가능 권한으로 추가한다.
+스프레드시트의 공유 설정에 들어가서 해당 이메일을 수정가능 권한으로 추가한다
 
 ### 준비물 - 네이버 검색 API
 ISBN으로 도서 정보를 검색할때는 네이버 검색 API를 이용한다.
@@ -58,9 +60,18 @@ client id, client secret를 확보한다.
 
 #### 사용법
 1. 앱 이름은 `Fumika Scanner`이다.
+
+![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-icon.png)
+
 2. `READ BARCODE`를 누르면 바코드를 찍을수 있다. 이 상태에서 바코드를 찍는다.
+![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-init.png)
+
 3. `READY: {ISBN}` 버튼을 누른다. 찍은 바코드를 구글 스프레드시트에 업로드하게된다.
+![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/android-isbn.png)
+
 4. 바코드가 스프레드시트에 추가되었는지 확인한다.
+![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/sheet-isbn-sample.png)
+
 5. 문제가 없다면 바코드 찍고 업로드하는 과정을 반복한다.
 
 
@@ -98,3 +109,5 @@ Google API Console에서 얻은 json 파일을 다음 위치에 넣어준다.
 1. ISBN 목록을 데이터 갱신자가 사용할 시트에 넣어준다. A2 이후에 넣어준다. 첫번째행은 필드로 예약되어있다.
 2. `./service`
 3. 스프레드시트의 내용이 갱신된 것을 확인한다. 제목, 출판사, 저자, 가격, 중고매각가가 채워져있을것이다.
+
+![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/sheet-info-sample.png)
