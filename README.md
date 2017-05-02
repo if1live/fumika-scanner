@@ -114,3 +114,5 @@ Google API Console에서 얻은 json 파일을 다음 위치에 넣어준다.
 3. 스프레드시트의 내용이 갱신된 것을 확인한다. 제목, 출판사, 저자, 가격, 중고매각가가 채워져있을것이다.
 
 ![android icon](https://raw.githubusercontent.com/if1live/fumika-scanner/master/document/sheet-info-sample.png)
+
+4. 행에서 ISBN을 제외한 내용을 지우고 `./service`를 실행하면 정보를 갱신한다. 중고 매각가만 갱신하고싶은 경우 `skip`를 지운다.
